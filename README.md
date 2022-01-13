@@ -1,6 +1,6 @@
-![heading](https://assets.rainmaking.cloud/images/neighborhood.png)
-
 # Serverless Containers on AWS
+
+![heading](https://assets.rainmaking.cloud/images/neighborhood.png)
 
 ## Introduction
 
