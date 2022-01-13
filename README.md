@@ -14,11 +14,14 @@ Let's be honest, that's enough to confuse any non tech savvy folk and then some.
 
 Run containers at scale with the least operational overhead by leveraging Amazon Elastic Container Service and Amazon Fargate. 
 
-This solution can be used for several use cases:
+Of course Fargate is not suitable for all scenarios. AWS recommendations are as follow:
 
-- web serving,
-- batch compute,
-- microservices.
+- Large workloads that need to be optimized for low overhead
+- Small workloads that have occasional burst
+- Tiny workloads
+- Batch workloads
+
+Of course, Fargate is really well documented here: [AWS Fargate](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html).
 
 ## Pros and Cons
 
@@ -35,19 +38,42 @@ This solution can be used for several use cases:
 - Some usage scenario may require the use of additional AWS services (ALB, EFS, etc.),
 - Amazon Fargate is good for general purpose compute, may not suit HPC requirements.
 
-## Use Cases 
-
-### Web Server
+##  Web Serving
 
 ECS with Fargate is an awesome solution for web serving. It strikes a great balance between the need for low compute generally required for static serving while still allowing some server side processing. Also while S3 Static Web Sites is the go to approach for static web sites which requires a tremendous throughput at almost no cost, we found out that it's not great at serving content on the internal network where data must never leave the on-prem network.
 
 This diagrams explains the scaffolded resources to serve web applications on Amazon Fargate with auto scaling and Blue/Green deployment using CodeDeploy.
 
-![large](https://assets.rainmaking.cloud/images/ecs_fargate_web_server_awshla.jpg)
+![large](https://assets.rainmaking.cloud/images/ecs_fargate_web_server_awshla.png)
 
-### Micro Services
+### Bill of Material
 
+The infrastructure described in the above diagram requires the following resources.
 
+#### Elastic Container Service (ECS) Cluster
+
+Hosts the service and manages capacity providers if necessary. However, since we're using Fargate it's not necessary to configure this. The best source of documentation for this service remains the official AWS documentation: [What is Amazon Elastic Container Service?](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
+
+#### ECS Task Definition
+
+A task definition is required to run Docker containers in Amazon ECS. It defines how much compute and memory resource are allocated to a task and its containers. When deploying tasks using a Fargate launch type, it's required to use the [AWSVPC networking mode](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking-awsvpc.html).
+
+##### One container vs multiple containers per task
+
+It's possible to run multiple containers within a single task. However, these factors have to be considered:
+
+- Do the containers share the same lifecycle? Obviously, stateful and stateless containers don't share the same lifecycle.
+- Do the containers rely on the same underlying host?
+- Do the containers share resources?
+- Do the containers share volumes?
+
+#### ECS Service
+
+The service is the key piece that orchestrates and schedules tasks.
+
+#### Application Load Balancer
+
+An application load balancer is used in this scenario to expose the services task instances.
 
 
 
