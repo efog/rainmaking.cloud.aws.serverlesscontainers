@@ -1,6 +1,6 @@
-# Serverless Containers on AWS
-
 ![heading](https://assets.rainmaking.cloud/images/neighborhood.png)
+
+# Serverless Containers on AWS
 
 ## Introduction
 
@@ -21,7 +21,9 @@ Of course Fargate is not suitable for all scenarios. AWS recommendations are as 
 - Tiny workloads
 - Batch workloads
 
-Of course, Fargate is really well documented here: [AWS Fargate](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html).
+Fargate is really well documented here: [AWS Fargate](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html).
+
+Finally, you can get directly to the code here: [https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers)
 
 ## Pros and Cons
 
