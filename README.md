@@ -140,7 +140,7 @@ this.webServerApplicationLoadBalancerProductionListener.addTargets("webServerPro
         "healthyThresholdCount": 3,
         "interval": Duration.seconds(30),
         "path": "/",
-        "port": `${props.webServerContainerPort}`,
+        "port": props.webServerContainerPort.toString(),
         "timeout": Duration.seconds(10),
         "unhealthyThresholdCount": 5
     },
@@ -162,7 +162,7 @@ if (props.webserverDeploymentType === DeploymentControllerType.CODE_DEPLOY) {
             "healthyThresholdCount": 3,
             "interval": Duration.seconds(30),
             "path": "/",
-            "port": `${props.webServerContainerPort}`,
+            "port": props.webServerContainerPort.toString(),
             "protocol": AlbProtocol.HTTP,
             "timeout": Duration.seconds(10),
             "unhealthyThresholdCount": 5
