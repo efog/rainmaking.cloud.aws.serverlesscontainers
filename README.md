@@ -184,7 +184,7 @@ if (props.webserverDeploymentType === DeploymentControllerType.CODE_DEPLOY) {
 
 ### Costs
 
-I'm often asked to estimate the costs of services on AWS and it's usually a task that can take forever as there so many things to consider. By experience, it's better to estimate the costs of the high value services first (ex: Amazon Transcribe), next the compute and finally the storage and networking. As always, pricing consumption remains an art at estimation but here are the general lines of costs for this stack. 
+I'm often asked to estimate the costs of services on AWS and it's usually a task that can take forever as there are so many things to consider. By experience, it's better to estimate the costs of high value services first (ex: Amazon Transcribe), next the compute and finally the storage and networking. As always, pricing consumption remains an art at estimation but here are the general lines of costs for this stack. 
 
 #### Application Load Balancer
 
