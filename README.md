@@ -85,7 +85,7 @@ const taskDefinitionProps = Object.assign({}, props.webServerTaskDefinitionProps
 this.webServerTaskDefinition = new TaskDefinition(this, "webServerTaskDefinition", taskDefinitionProps);
 this.webServerTaskDefinition.addContainer(props.containerDefinition.containerName, props.containerDefinition);
 ````
-[Code](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L82-L94)
+[Code on GitHub](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L82-L94)
 
 ##### One container vs multiple containers per task
 
@@ -118,7 +118,7 @@ this.webServerFargateService = new FargateService(this, "webserverFargateService
     "deploymentController": deploymentController
 });
 ````
-[Code](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L106-L174)
+[Code on GitHub](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L106-L174)
 
 #### Application Load Balancer
 
@@ -180,7 +180,7 @@ if (props.webserverDeploymentType === DeploymentControllerType.CODE_DEPLOY) {
     });
 }
 ````
-[Code](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L106-L174)
+[Code on GitHub](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L106-L174)
 
 ### Costs
 
@@ -204,8 +204,8 @@ Details on AWS Application Load Balancer costs can be found here [https://aws.am
 
 The good news here is that ECS is basically free to use. What costs though is the compute consumption and the networking. Since we're using Fargate, costs are estimated using these dimensions:
 
-- GB/Hour. The number of GB/hour used in a month. Simply put, a task requiring 1GB of RAM for a whole month of a Linux/X86 costs as of Jan. 2022 in CA-CENTRAL-1 costs $0.004865 per hour (720 * $0.004865 = $3.50).
-- vCPU/Hour. The number of virtual CPU used by hour. Simply put, a task requiring 1 vCPU for a whole month of a Linux/X86 costs as of Jan. 2022 in CA-CENTRAL-1 costs $0.04456 per hour (720 * $0.04456 = $32.00).
+- GB/Hour. The number of GB/hour used in a month. Simply put, a task requiring 1GB of RAM for a whole month of a Linux/X86 as of Jan. 2022 in CA-CENTRAL-1 costs $0.004865 per hour (720 * $0.004865 = $3.50).
+- vCPU/Hour. The number of virtual CPU used by hour. Simply put, a task requiring 1 vCPU for a whole month of a Linux/X86 as of Jan. 2022 in CA-CENTRAL-1 costs $0.04456 per hour (720 * $0.04456 = $32.00).
 
 Of course, that's using on-demand pricing without saving plans or spot pricing. It's possible to reduce the costs by a sizeable margin using these strategies.
 
