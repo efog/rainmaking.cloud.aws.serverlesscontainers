@@ -103,12 +103,6 @@ export default class EcsFargateComputeStack extends Stack {
             "protocol": props.webServerApplicationLoadBalancerProductionListenerProtocol || ApplicationProtocol.HTTP
         });
 
-        this.webServerApplicationLoadBalancerTestListener = this.webServerApplicationLoadBalancer.addListener("testListener", {
-            "port": props.webServerApplicationLoadBalancerProductionListenerPort || 8080,
-            "protocol": props.webServerApplicationLoadBalancerProductionListenerProtocol || ApplicationProtocol.HTTP,
-            "defaultAction": ListenerAction.fixedResponse(200, { "messageBody": 'This is the ALB Default Action' })
-        });
-
         const deploymentController = props.webserverDeploymentType === DeploymentControllerType.ECS ? {
             "type": DeploymentControllerType.ECS
         } as DeploymentController : props.webserverDeploymentType === DeploymentControllerType.CODE_DEPLOY ? {
@@ -150,6 +144,11 @@ export default class EcsFargateComputeStack extends Stack {
         });
 
         if (props.webserverDeploymentType === DeploymentControllerType.CODE_DEPLOY) {
+            this.webServerApplicationLoadBalancerTestListener = this.webServerApplicationLoadBalancer.addListener("testListener", {
+                "port": props.webServerApplicationLoadBalancerProductionListenerPort || 8080,
+                "protocol": props.webServerApplicationLoadBalancerProductionListenerProtocol || ApplicationProtocol.HTTP,
+                "defaultAction": ListenerAction.fixedResponse(200, { "messageBody": 'This is the ALB Default Action' })
+            });
             const webServerTestTargetGroup = {
                 "deregistrationDelay": Duration.seconds(30),
                 "healthCheck": {
