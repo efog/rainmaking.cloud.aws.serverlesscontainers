@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Something quite as fundamental as running containers on AWS can quickly become confusing. How could this possibly be? Ain't the cloud supposed to make things simple? Isn't it just about loading up an instance, setup Docker and call it a day? Nope, that's not it. Last year Corey Quinn made this tongue in cheek statement that became a meme at AWS: [There are 17 Ways to Run Containers on AWS](https://www.lastweekinaws.com/blog/the-17-ways-to-run-containers-on-aws/). 
+Something quite as fundamental as running containers on AWS can quickly become confusing. How could this possibly be? Ain't the cloud supposed to make things simple? Isn't it just about loading up an instance, setup Docker and call it a day? Nope, that's not it. Last year Corey Quinn made this tongue in cheek statement that became a meme at AWS: [The 17 Ways to Run Containers on AWS](https://www.lastweekinaws.com/blog/the-17-ways-to-run-containers-on-aws/). 
 
 ![medium](https://pbs.twimg.com/media/E1vfq8qVIAUkVNK?format=jpg&name=small)
 
@@ -65,6 +65,7 @@ this.ecsCluster = new Cluster(this, "ecsFargateCluster", {
     "vpc": this.vpc
 });
 ````
+[Code in Github](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L38-L45)
 
 #### ECS Task Definition
 
@@ -84,6 +85,7 @@ const taskDefinitionProps = Object.assign({}, props.webServerTaskDefinitionProps
 this.webServerTaskDefinition = new TaskDefinition(this, "webServerTaskDefinition", taskDefinitionProps);
 this.webServerTaskDefinition.addContainer(props.containerDefinition.containerName, props.containerDefinition);
 ````
+[Code](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L82-L94)
 
 ##### One container vs multiple containers per task
 
@@ -116,6 +118,7 @@ this.webServerFargateService = new FargateService(this, "webserverFargateService
     "deploymentController": deploymentController
 });
 ````
+[Code](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L106-L174)
 
 #### Application Load Balancer
 
@@ -177,7 +180,44 @@ if (props.webserverDeploymentType === DeploymentControllerType.CODE_DEPLOY) {
     });
 }
 ````
+[Code](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L106-L174)
 
+### Costs
 
+I'm often asked to estimate the costs of services on AWS and it's usually a task that can take forever as there so many things to consider. By experience, it's better to estimate the costs of the high value services first (ex: Amazon Transcribe), next the compute and finally the storage and networking. As always, pricing consumption remains an art at estimation but here are the general lines of costs for this stack. 
 
+#### Application Load Balancer
 
+AWS application load balancer usage is measured by two metrics:
+
+- Application load balancer hour. In CA-CENTRAL-1, as of Jan. 2022, the cost is $0.02475 per hour.
+- Used Application load balancer capacity unit-hour (or partial hour) LCU. It's the most difficult usage metric to calculate but fortunately it's the cheapest of the two. In CA-CENTRAL-1 it's as of Jan. 2022 $ 0.0088/LCU Hour. An LCU is a combination of four dimensions and only the dimension with the highest usage is considered:
+
+   - Number of new connections per second averaged over an hour,
+   - Active connections per minute averaged over an hour,
+   - Processed bytes,
+   - Rule evaluations, the first 10 rules are free, the rest are measured.
+
+Details on AWS Application Load Balancer costs can be found here [https://aws.amazon.com/elasticloadbalancing/pricing/](https://aws.amazon.com/elasticloadbalancing/pricing/)
+
+#### Elastic Container Service
+
+The good news here is that ECS is basically free to use. What costs though is the compute consumption and the networking. Since we're using Fargate, costs are estimated using these dimensions:
+
+- GB/Hour. The number of GB/hour used in a month. Simply put, a task requiring 1GB of RAM for a whole month of a Linux/X86 costs as of Jan. 2022 in CA-CENTRAL-1 costs $0.004865 per hour (720 * $0.004865 = $3.50).
+- vCPU/Hour. The number of virtual CPU used by hour. Simply put, a task requiring 1 vCPU for a whole month of a Linux/X86 costs as of Jan. 2022 in CA-CENTRAL-1 costs $0.04456 per hour (720 * $0.04456 = $32.00).
+
+Of course, that's using on-demand pricing without saving plans or spot pricing. It's possible to reduce the costs by a sizeable margin using these strategies.
+
+For more details on pricing calculations for Fargate, head here: [https://aws.amazon.com/fargate/pricing/?nc=sn&loc=2](https://aws.amazon.com/fargate/pricing/?nc=sn&loc=2).
+
+## Useful Links
+
+- [The 17 Ways to Run Containers on AWS](https://www.lastweekinaws.com/blog/the-17-ways-to-run-containers-on-aws/)
+- [https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html)
+- [https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers)
+- [What is Amazon Elastic Container Service?](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
+- [AWSVPC networking mode](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking-awsvpc.html)
+- [https://aws.amazon.com/elasticloadbalancing/pricing/](https://aws.amazon.com/elasticloadbalancing/pricing/)
+- [https://aws.amazon.com/fargate/pricing/?nc=sn&loc=2](https://aws.amazon.com/fargate/pricing/?nc=sn&loc=2)
+- [AWS CDK API Reference](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-construct-library.html)
