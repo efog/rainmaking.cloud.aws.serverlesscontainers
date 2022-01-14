@@ -46,7 +46,7 @@ ECS with Fargate is an awesome solution for web serving. It strikes a great bala
 
 This diagrams explains the scaffolded resources to serve web applications on Amazon Fargate with auto scaling and Blue/Green deployment using CodeDeploy.
 
-![large](https://assets.rainmaking.cloud/images/ecs_fargate_web_server_awshla.png)
+![medium](https://assets.rainmaking.cloud/images/ecs_fargate_web_server_awshla.png)
 
 ### Bill of Material
 
