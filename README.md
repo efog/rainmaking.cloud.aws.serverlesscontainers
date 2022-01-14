@@ -83,7 +83,6 @@ const taskDefinitionProps = Object.assign({}, props.webServerTaskDefinitionProps
 } as TaskDefinitionProps);
 this.webServerTaskDefinition = new TaskDefinition(this, "webServerTaskDefinition", taskDefinitionProps);
 this.webServerTaskDefinition.addContainer(props.containerDefinition.containerName, props.containerDefinition);
-trace(`completed task definition`);
 ````
 
 ##### One container vs multiple containers per task
