@@ -14,18 +14,16 @@ Learn how to run containers at scale using Amazon Elastic Container Service, Ama
 
 What is Amazon Fargate? It's a technology that you can use with Amazon ECS to run containers without having to manage servers or clusters of Amazon EC2 instances. 
 
+The CDK scaffolding example code can be found here: [https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers)
+
+By using managed and serverless services chances are you'll be improving on your reliability and operational efficiency. As always, keep in mind the shared responsibility model when making cloud design decisions.
+
 Of course Amazon Fargate is not suitable for all scenarios. If your looking for a solution that fits the following payload types, Amazon Fargate is what you need:
 
 - Large workloads that need to be optimized for low overhead
 - Small workloads that have occasional burst
 - Tiny workloads
 - Batch workloads
-
-The CDK scaffolding example code can be found here: [https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers)
-
-## Pros and Cons
-
-The solution presented has advantages and disadvantages. By using managed and serverless services chances are you'll be improving on your reliability and operational efficiency. As always, keep in mind the shared responsibility model when making cloud design decisions.
 
 ### Pros
 
@@ -101,7 +99,7 @@ this.webServerTaskDefinition = new TaskDefinition(this, "webServerTaskDefinition
 ````
 [Code on GitHub](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers/blob/fe5744b7f133259a8aeee3693f7ae6d3f6893ef3/stack/lib/ecs-fargate-compute-stack/ecs-fargate-compute-stack.ts#L82-L94)
 
-##### Container definition
+#### Container definition
 
 A container definition is used to configure which container(s) will run in the task definition. The container definition's content instructs the Docker deamon how to run the image.
 
