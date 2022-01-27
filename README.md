@@ -2,21 +2,17 @@
 
 # Serverless Containers on AWS
 
-Something quite as fundamental as running containers on AWS can quickly become confusing. How could this possibly be? Ain't the cloud supposed to make things simple? Isn't it just about loading up an instance, setup Docker and call it a day? Nope, that's not it. Last year Corey Quinn made this tongue in cheek statement that became a meme at AWS: [The 17 Ways to Run Containers on AWS](https://www.lastweekinaws.com/blog/the-17-ways-to-run-containers-on-aws/). 
-
-![medium](https://pbs.twimg.com/media/E1vfq8qVIAUkVNK?format=jpg&name=small)
-
-Let's be honest, that's enough to confuse any non tech savvy folk and then some. And why is it this way? Simply because each of these 17 way enables different use cases.
+Running containers efficiently at scale requires container orchestration, network, storage and of course compute. Elastic Kubernetes Service (EKS) or Elastic Container Service (ECS) are both great container orchestration solutions. The former gives more of that "Cloud Native" flavour while the latter is the way to go for teams looking for a simpler yet very efficient solution to run containers on AWS. In both cases lies at the core the acquisition of compute resources. On AWS this means the provisioning of EC2 instances or, better yet, Serverless Resources through Amazon Fargate. Serverless is a cloud execution model which allows the acquisition of compute resources on a truly pay-per-use model which removes most operational burden from the teams.
 
 ## What's in it for You
 
-Learn how to run containers at scale using Amazon Elastic Container Service, Amazon Fargate and the CDK scaffolding provided.
+Learn how to run containers at scale using Amazon ECS, Amazon Fargate and the CDK scaffolding provided.
 
-What is Amazon Fargate? It's a technology that you can use with Amazon ECS to run containers without having to manage servers or clusters of Amazon EC2 instances. 
+What is Amazon Fargate? It's a technology that you can use with Amazon ECS or EKS to run containers without having to manage servers or clusters of Amazon EC2 instances. 
 
 The CDK scaffolding example code can be found here: [https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers](https://github.com/efog/rainmaking.cloud.aws.serverlesscontainers)
 
-By using managed and serverless services chances are you'll be improving on your reliability and operational efficiency. As always, keep in mind the shared responsibility model when making cloud design decisions.
+Using managed and serverless compute resources improves on reliability and operational efficiency. As always, keep in mind the shared responsibility model when making cloud design decisions.
 
 Of course Amazon Fargate is not suitable for all scenarios. If your looking for a solution that fits the following payload types, Amazon Fargate is what you need:
 
@@ -38,11 +34,11 @@ Of course Amazon Fargate is not suitable for all scenarios. If your looking for 
 - Some usage scenario may require the use of additional AWS services (ALB, EFS, etc.),
 - Amazon Fargate is good for general purpose compute, may not suit HPC requirements.
 
-##  One Sample Use Case: Web Serving
+## Sample Use Case: Web Serving
 
-Amazon ECS with Amazon Fargate is an awesome platform for web serving. It strikes a great balance between the need for low compute generally required for static serving while still allowing some server side processing (SPA with server side rending anyone?). The addition of the use of CloudFront as a CDN in front of the Application Load Balancer will help shrinking the size of the Fargate tasks thus improving on your usage costs.
+Amazon Fargate is an awesome solution for web serving. It strikes a great balance between the need for low compute of static serving while still allowing some server side processing. The addition of the use of CloudFront as a CDN before the Application Load Balancer will help shrink the size of the Fargate tasks thus improving on the usage costs.
 
-While S3 Static Web Site is the way to go for simple static web sites with an unpredictable peak load at almost no cost, it's not meant at all for serving content on the internal network where data must never leave the on-prem network or it gets quickly complicated to bolt on an API on top, let alone forgetting completly about server side rendering.
+While S3 Static Web Site is the way to go for simple static web sites with unpredictable peak loads at almost no cost. Doing so doesn't quite work for serving content on an internal network where data must never leave the enterprise network, bolting on an API is not a piece of cake and it forbids server side rendering.
 
 The following diagram explains the required resources to serve web applications on Amazon ECS with Amazon Fargate with auto scaling, load balancing and Blue/Green deployment using CodeDeploy.
 
@@ -54,7 +50,7 @@ The provided CDK code with this article will scaffold all the following AWS reso
 
 #### Elastic Container Service (ECS) Cluster
 
-ECS hosts the service and manages capacity providers if necessary. Since we're using Amazon Fargate a built-in capacity provider will be created automatically through the enableFargateCapacityProviders parameter. The best source of documentation for this service remains the official AWS documentation: [What is Amazon Elastic Container Service?](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
+An ECS cluster hosts services and manages capacity providers. In an EC2 based scenario, one or more capacity providers have to be configured along with their launch templates, auto-scaling groups and AMIs. In a Fargate based scenrion, a built-in capacity provider will be created automatically through the enableFargateCapacityProviders parameter. 
 
 ````typescript
 this.ecsCluster = new Cluster(this, "ecsFargateCluster", {
@@ -69,11 +65,11 @@ this.ecsCluster = new Cluster(this, "ecsFargateCluster", {
 
 #### ECS Task Definition
 
-A task definition is required to run Docker containers in Amazon ECS. It defines how much compute and memory resources are allocated to a task and its containers. 
+A task definition details how much compute and memory resources are allocated to a task and its containers. 
 
-First thing to know, since Amazon Fargate doesn't run on any EC2 instances that you own, it's required to use the AWS VPC network mode. In a nutshell, it means that Amazon Fargate will create for each task instance an Elastic Network Interface in your VPC. If we were to use EC2 launch type, we'd have the possibility to use the common Docker network modes such as Host, Bridge or None. What's also great is that AWS VPC network mode is also possible with EC2 launch type! However some thoughts have to given as to not exceed the EC2 instance attached ENIs limit. Since we're speaking of networking, isn't it necessary to specify which subnets and security groups to use you may ask. It's a valid question but no, not here, it's a the service configuration level.
+Since Amazon Fargate doesn't run on any EC2 instances that you own, it's necessary to use the AWS VPC network mode. In a nutshell, this means that Amazon Fargate will create for each task instance an Elastic Network Interface attached to your VPC. For an EC2 launch type, we'd have the possibility to use the common Docker network modes such as Host, Bridge or None. The AWS VPC network mode is also possible with EC2 launch type. However some thoughts have to given as to not exceed the EC2 instance attached ENIs limit. 
 
-The other important parameter to set is the compatibility type. If the task will only run on Amazon Fargate then setting it to Compatibility.FARGATE is fine. Another option which would also work in our context is EC2_FARGATE.
+The other important parameter to set is the compatibility type. If the task will only run on Amazon Fargate then setting it to Compatibility.FARGATE is fine. Another option which would also work in our context is EC2_FARGATE. By selecting this second option, it would be possible to use both a configured EC2 based capacity provider along with a Fargate one. This kind of setup is generally found in context where Fargate is used to acquire peak compute resources beyond is needed in steady state.
 
 ````typescript
 ecsFargateWebServerProps.webServerTaskDefinitionProps = {
@@ -231,7 +227,8 @@ if (props.webserverDeploymentType === DeploymentControllerType.CODE_DEPLOY) {
 
 ### Networking
 
-The sample provided with this article deploys everything in public subnets. It's not great for production purposes I grant it. In order to be able to use this deploy the ECS tasks in private subnets, the use of a NAT Gateway (and NAT Gateways are bad mmmkay) is necessary if the container registry sits outside of AWS. However, if your target setup uses ECR then it's much more cost effective to use VPC endpoints. Here's a list of all the VPC endpoints which are necessary:
+The sample provided with this article deploys everything in two public subnets. Although it's not the most secure approach because it leaves your task executions potentially exposed to the Internet, thightly securing the tasks with Security Groups will efficiently protect the compute resources. 
+Alternatively, to deploy ECS tasks in private subnets, the use of a NAT Gateway quickly becomes mandatory. In such network setup, it's recommended to have a proper thinking on VPC endpoints. They do are helpful on privae subnets based setup but comes at costs and not every AWS services are available. Here's a list of all the VPC endpoints which are minimally required if you opt for the private subnets route:
 
 - Amazon S3 (please read [this](https://docs.aws.amazon.com/AmazonECR/latest/userguide/vpc-endpoints.html#ecr-setting-up-s3-gateway)),
 - Amazon ECR,
@@ -239,18 +236,18 @@ The sample provided with this article deploys everything in public subnets. It's
 
 ### Monitoring
 
-Basic monitoring is achievable with the sample's setup. However, it becomes quickly necessary to consider turning on the container insights metrics to get more granular details on the containers behaviors. In turn, this will enable more fine grained scaling scenarios.
+Basic monitoring is achievable with the sample's setup. However, it becomes quickly necessary to consider turning on the container insights metrics to get more granular details on the containers behaviors. In turn, this will enable more fine grained scaling scenarios. 
 
 ### Costs
 
-I'm often asked to estimate the costs of services on AWS and it's usually a task that can take forever as there are so many things to consider. By experience, it's better to estimate the costs of high value services first (ex: Amazon Transcribe), next the compute and finally the storage and networking. As always, pricing consumption remains an art at estimation but here are the general lines of costs for this stack. 
+I'm often asked to estimate the costs of services on AWS and it's usually a task that can take forever as there are so many things to consider. By experience, it's better to estimate the costs of high value services first (ex: EC2, Fargate, Amazon Transcribe, etc.). As always, pricing estimation remains what is it (an educated guess) but here are basic starting points which give a pretty good overview. All prices below are as of Jan. 2022 in CA-CENTRAL-1 region. 
 
-#### Application Load Balancer
+#### Application Load Balancer Costs
 
-AWS application load balancer usage is measured by two metrics:
+AWS application load balancer usage is measured with two metrics:
 
-- Application load balancer hour. In CA-CENTRAL-1, as of Jan. 2022, the cost is $0.02475 per hour.
-- Used Application load balancer capacity unit-hour (or partial hour) LCU. It's the most difficult usage metric to calculate but fortunately it's the cheapest of the two. In CA-CENTRAL-1 it's as of Jan. 2022 $ 0.0088/LCU Hour. An LCU is a combination of four dimensions and only the dimension with the highest usage is considered:
+- Application load balancer hour. The cost is $0.02475 per hour.
+- Used Application load balancer capacity unit-hour (or partial hour) LCU. It's the most difficult usage metric to calculate but fortunately it's the cheapest of the two. It costs $ 0.0088/LCU Hour. An LCU is a combination of four dimensions and only the dimension with the highest usage is considered:
 
    - Number of new connections per second averaged over an hour,
    - Active connections per minute averaged over an hour,
@@ -259,12 +256,16 @@ AWS application load balancer usage is measured by two metrics:
 
 Details on AWS Application Load Balancer costs can be found here [https://aws.amazon.com/elasticloadbalancing/pricing/](https://aws.amazon.com/elasticloadbalancing/pricing/)
 
-#### Elastic Container Service
+Total: 20.00 USD per month.
 
-The good news here is that ECS is basically free to use. What costs though is the compute consumption and the networking. Since we're using Fargate, costs are estimated using these dimensions:
+#### Elastic Container Service Costs
 
-- GB/Hour. The number of GB/hour used in a month. A task requiring 1GB of RAM of a Linux/X86 as of Jan. 2022 in CA-CENTRAL-1 costs $0.004865 per hour (720 * $0.004865 = $3.50/month).
-- vCPU/Hour. The number of virtual CPU used by hour. A task requiring 1 vCPU of a Linux/X86 as of Jan. 2022 in CA-CENTRAL-1 costs $0.04456 per hour (720 * $0.04456 = $32.00/month).
+The good news here is that ECS is basically free to use. What costs though is the compute consumption and the networking. Since we're using Fargate, costs are based on these dimensions:
+
+- GB/Hour. The number of GB/hour used in a month. A task requiring 1GB of RAM of a Linux/X86 costs $0.004865 per hour (720 * $0.004865 = $3.50/month).
+- vCPU/Hour. The number of virtual CPU used by hour. A task requiring 1 vCPU of a Linux/X86 costs $0.04456 per hour (720 * $0.04456 = $32.00/month).
+
+Total: 35.50 USD per month.
 
 Of course, that's using on-demand pricing without saving plans or spot pricing. It's possible to reduce the costs by a sizeable margin using these strategies.
 
