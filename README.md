@@ -14,7 +14,7 @@ The CDK scaffolding example code can be found here: [https://github.com/efog/rai
 
 Using managed and serverless compute resources improves on reliability and operational efficiency. As always, keep in mind the shared responsibility model when making cloud design decisions.
 
-Of course Amazon Fargate is not suitable for all scenarios. If your looking for a solution that fits the following payload types, Amazon Fargate is what you need:
+Of course Amazon Fargate is not suitable for all scenarios. If you're looking for a solution that fits the following payload types, Amazon Fargate is what you need:
 
 - Large workloads that need to be optimized for low overhead
 - Small workloads that have occasional burst
